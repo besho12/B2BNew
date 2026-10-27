@@ -1,0 +1,22 @@
+import { computed } from 'vue'
+import { useAuthStore } from './stores/auth'
+
+const messages: Record<'en' | 'ar', Record<string, string>> = {
+  en: {
+    dashboard: 'Dashboard', leads: 'Leads', tasks: 'Tasks', inventory: 'Inventory', deals: 'Deals',
+    commissions: 'Commissions', reports: 'Reports', locations: 'Locations', developers: 'Developers', company: 'Company profile', team: 'Team', search: 'Search',
+    newLead: 'New lead', overview: 'Overview', welcome: 'Good to see you', signOut: 'Sign out',
+  },
+  ar: {
+    developers: 'المطورون العقاريون', company: 'ملف الشركة',
+    dashboard: 'لوحة التحكم', leads: 'العملاء', tasks: 'المهام', inventory: 'العقارات', deals: 'الصفقات',
+    commissions: 'العمولات', reports: 'التقارير', locations: 'المناطق', team: 'الفريق', search: 'بحث',
+    newLead: 'عميل جديد', overview: 'نظرة عامة', welcome: 'أهلاً بعودتك', signOut: 'تسجيل الخروج',
+  },
+} as const
+
+export function useI18n() {
+  const auth = useAuthStore()
+  const t = computed(() => messages[auth.locale])
+  return { t }
+}
