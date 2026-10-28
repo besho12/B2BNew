@@ -26,6 +26,21 @@ class PlatformAdminController extends Controller
         ], 'is_platform_admin' => true]);
     }
 
+    public function users(Request $request)
+    {
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:120'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+        $query = User::query()->where('is_platform_admin', true)
+            ->when($filters['search'] ?? null, function ($query, $search) {
+                $query->where(fn ($users) => $users->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
+            })
+            ->orderBy('name')->select(['id', 'name', 'email', 'created_at']);
+
+        return response()->json($query->paginate(25));
+    }
+
     public function overview(Request $request)
     {
         [$from, $to] = $this->dateRange($request);

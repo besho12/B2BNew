@@ -29,7 +29,7 @@ onMounted(async () => {
     <div v-if="loading" class="panel commission-order-loading">Preparing commission payment order…</div>
     <div v-else-if="error" class="detail-alert">{{ error }}</div>
     <article v-else-if="entry" class="commission-order-sheet">
-      <header class="commission-order-header"><div class="commission-order-brand"><span class="brand-mark">E</span><span><strong>EXOUSIA REALTY</strong><small>WORKSPACE COMMISSION ORDER</small></span></div><span class="commission-order-copy">EMPLOYEE COPY</span></header>
+      <header class="commission-order-header"><div class="commission-order-brand"><span class="brand-mark">B</span><span><strong>B2B PORTAL</strong><small>WORKSPACE COMMISSION ORDER</small></span></div><span class="commission-order-copy">EMPLOYEE COPY</span></header>
       <div class="commission-order-title"><div><span class="eyebrow">COMMISSION PAYMENT</span><h1>Employee commission order</h1><p>Payment is processed after the signed order is returned and verified.</p></div><span class="commission-status" :class="entry.status">{{ entry.status.replace(/_/g, ' ') }}</span></div>
       <div class="commission-order-meta"><div><small>Order number</small><strong>{{ orderNumber() }}</strong></div><div><small>Prepared on</small><strong>{{ date(entry.created_at) }}</strong></div><div><small>Deal reference</small><strong>#{{ entry.deal_id }}</strong></div></div>
       <section class="commission-order-section"><h2>Employee</h2><div class="commission-order-employee"><div><small>Full name</small><strong>{{ entry.payee_name }}</strong></div><div><small>Email address</small><strong>{{ entry.payee_email || '—' }}</strong></div><div><small>Workspace</small><strong>{{ auth.bootstrap?.company.name }}</strong></div></div></section>
@@ -38,7 +38,7 @@ onMounted(async () => {
       </section>
       <section class="commission-order-acknowledgment"><h2>Employee acknowledgment</h2><p>I confirm that I have reviewed the commission amount and unit details above. My signature acknowledges this commission payment order.</p><div class="commission-signature-grid"><div><span>Employee signature</span><i></i></div><div><span>Printed name</span><i>{{ entry.payee_name }}</i></div><div><span>Date signed</span><i></i></div></div></section>
       <section class="commission-order-approval"><h2>For workspace administration</h2><div><span>Prepared / verified by</span><i></i><span>Payment reference</span><i></i><span>Paid on</span><i></i></div></section>
-      <footer class="commission-order-footer"><span>Generated from Exousia Realty commission records.</span><span>This order is not proof of payment until the workspace records it as paid.</span></footer>
+      <footer class="commission-order-footer"><span>Generated from workspace commission records.</span><span>This order is not proof of payment until the workspace records it as paid.</span></footer>
     </article>
   </div>
 </template>

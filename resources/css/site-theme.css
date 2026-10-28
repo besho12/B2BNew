@@ -1,0 +1,45 @@
+:root {
+  --portal-primary: #173b3a;
+  --portal-secondary: #648779;
+  --portal-accent: #c8a66d;
+  --portal-surface: #f4f5f1;
+  --ink: var(--portal-primary);
+  --gold: var(--portal-accent);
+}
+
+.app-frame .sidebar { background: var(--portal-primary); }
+.app-frame .brand-mark { background: var(--portal-accent); }
+.portal-brand-logo { width: 34px; height: 34px; flex: none; object-fit: contain; border-radius: 8px; background: #fff; }
+.app-frame .main-nav a.active { color: var(--portal-accent); background: color-mix(in srgb, var(--portal-accent) 14%, transparent); }
+.app-frame .button.primary { border-color: var(--portal-primary); background: var(--portal-primary); }
+.app-frame .button.primary:hover { background: color-mix(in srgb, var(--portal-primary) 88%, #fff); }
+.app-frame .topbar.site-header-light { background: #fff; color: var(--portal-primary); }
+.app-frame .topbar.site-header-dark { background: var(--portal-primary); color: #fff; }
+.app-frame .topbar.site-header-dark .profile-trigger,
+.app-frame .topbar.site-header-dark .profile-copy strong { color: #fff; }
+.app-frame .topbar.site-header-dark .profile-copy small { color: rgba(255,255,255,.68); }
+.app-frame .topbar.site-header-dark .global-search input { color: #fff; }
+.app-frame .topbar.site-header-dark .language-button { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.1); color: #fff; }
+.app-frame .topbar.site-header-brand { background: var(--portal-secondary); color: #fff; }
+.app-frame .topbar.site-header-brand .profile-trigger,
+.app-frame .topbar.site-header-brand .profile-copy strong { color: #fff; }
+.app-frame .topbar.site-header-brand .profile-copy small { color: rgba(255,255,255,.72); }
+.app-frame .topbar.site-header-brand .language-button { border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.12); color: #fff; }
+.site-announcement { padding: 8px 20px; background: var(--portal-accent); color: var(--portal-primary); text-align: center; font-size: 11px; font-weight: 700; }
+.landing-page { --land-ink: var(--portal-primary); --land-gold: var(--portal-accent); --land-paper: var(--portal-surface); }
+.landing-announcement { position: relative; z-index: 12; padding: 8px 20px; background: var(--portal-accent); color: var(--portal-primary); text-align: center; font-size: 10px; font-weight: 700; }
+.landing-announcement + .landing-nav { top: 32px; }
+.landing-nav.landing-header-dark { background: var(--portal-primary); color: #fff; }
+.landing-nav.landing-header-dark nav a,
+.landing-nav.landing-header-dark .landing-brand { color: #fff; }
+.landing-nav.landing-header-brand { background: var(--portal-secondary); color: #fff; }
+.landing-nav.landing-header-brand nav a,
+.landing-nav.landing-header-brand .landing-brand { color: #fff; }
+.landing-site-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 8px; background: #fff; }
+.landing-footer-contact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 13px; }
+.landing-footer-contact a { color: inherit; text-decoration: none; }
+.landing-footer-contact a:hover { color: var(--portal-accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .app-frame .button.primary:hover { transform: none; }
+}

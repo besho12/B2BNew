@@ -1,110 +1,121 @@
 <script setup lang="ts">
-import { ArrowDown, ArrowRight, ArrowUpRight, Building2, Check, Menu, ShieldCheck, Sparkles } from '@lucide/vue'
-import { ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { ArrowDownRight, ArrowRight, Check, Menu, PackageSearch, ShieldCheck, ShoppingBasket, Sparkles, UserRound } from '@lucide/vue'
+import { useSiteSettingsStore } from '../stores/siteSettings'
 
-const menuOpen = ref(false)
+const site = useSiteSettingsStore()
+const content = computed(() => site.settings.landing_content)
 const year = new Date().getFullYear()
+const menuOpen = ref(false)
+const prefersReducedMotion = ref(false)
+const categoryImages = ['/images/demo-products/product-01.svg', '/images/demo-products/product-08.svg', '/images/demo-products/product-09.svg']
+let motionQuery: MediaQueryList | null = null
+const videoType = computed(() => content.value.promo.video_url.toLowerCase().split('?')[0].endsWith('.webm') ? 'video/webm' : 'video/mp4')
+function syncMotionPreference(event?: MediaQueryListEvent) { prefersReducedMotion.value = event?.matches ?? motionQuery?.matches ?? false }
+onMounted(() => {
+  motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+  syncMotionPreference()
+  motionQuery.addEventListener?.('change', syncMotionPreference)
+})
+onBeforeUnmount(() => motionQuery?.removeEventListener?.('change', syncMotionPreference))
 </script>
 
 <template>
-  <main class="landing-page">
-    <header class="landing-nav">
-      <RouterLink to="/" class="landing-brand" aria-label="Exousia Realty home">
-        <span class="brand-symbol">E<span></span></span>
-        <span><strong>EXOUSIA</strong><small>REALTY</small></span>
+  <main class="portal-landing">
+    <div v-if="site.settings.announcement_enabled && site.settings.header_announcement" class="portal-landing-announcement">
+      <Sparkles :size="13"/><span>{{ site.settings.header_announcement }}</span>
+    </div>
+
+    <header class="portal-landing-nav" :class="`portal-header-${site.settings.header_style}`">
+      <RouterLink to="/" class="portal-landing-brand" :aria-label="`${site.settings.site_name} home`">
+        <img v-if="site.settings.logo_url" :src="site.settings.logo_url" :alt="`${site.settings.site_name} logo`">
+        <span v-else class="portal-landing-mark">{{ site.settings.site_name.slice(0, 1).toUpperCase() || 'B' }}</span>
+        <span><strong>{{ site.settings.site_name }}</strong><small>{{ site.settings.tagline }}</small></span>
       </RouterLink>
-      <button class="landing-menu-toggle" aria-label="Toggle navigation" @click="menuOpen = !menuOpen"><Menu :size="21" /></button>
-      <nav :class="{ open: menuOpen }">
-        <a href="#platform" @click="menuOpen = false">Platform</a>
-        <a href="#how-it-works" @click="menuOpen = false">How it works</a>
-        <a href="#property-matching" @click="menuOpen = false">Property matching</a>
-        <a href="#for-teams" @click="menuOpen = false">For your team</a>
-        <RouterLink to="/plans" @click="menuOpen = false">Plans</RouterLink>
-        <RouterLink to="/login" class="nav-sign-in">Sign in <ArrowUpRight :size="15" /></RouterLink>
+      <button class="portal-landing-menu" type="button" :aria-expanded="menuOpen" aria-label="Toggle navigation" @click="menuOpen = !menuOpen"><Menu :size="20"/></button>
+      <nav :class="{ open: menuOpen }" aria-label="Main navigation">
+        <a href="#catalogue" @click="menuOpen = false">Catalogue</a>
+        <a href="#benefits" @click="menuOpen = false">Why the portal</a>
+        <RouterLink to="/login" class="portal-nav-signin" @click="menuOpen = false"><UserRound :size="15"/> Sign in</RouterLink>
+        <RouterLink to="/register" class="portal-nav-join" @click="menuOpen = false">Request access <ArrowRight :size="15"/></RouterLink>
       </nav>
     </header>
 
-    <section class="landing-hero">
-      <div class="hero-copy">
-        <span class="landing-eyebrow"><i></i> THE REAL ESTATE WORKSPACE, REIMAGINED</span>
-        <h1>Every move brings<br />you <em>closer to home.</em></h1>
-        <p class="hero-intro">From the first hello to the keys in hand, give your real estate team one beautiful place to make every opportunity count.</p>
-        <div class="hero-actions">
-          <RouterLink to="/register" class="landing-button">Build your workspace <ArrowRight :size="17" /></RouterLink>
-          <a href="#platform" class="hero-text-link">Explore the platform <ArrowDown :size="15" /></a>
-        </div>
-        <div class="hero-proof"><span class="proof-icons"><i>R</i><i>C</i><i>+</i></span><span>Made for the people who make<br /><strong>every place feel like home.</strong></span></div>
+    <section v-if="content.promo.enabled && content.promo.video_url" class="portal-pinned-promo" aria-label="Featured promotion">
+      <video class="portal-pinned-video" :poster="content.promo.poster_url || undefined" :autoplay="!prefersReducedMotion" muted loop playsinline preload="metadata" aria-hidden="true" tabindex="-1">
+        <source :src="content.promo.video_url" :type="videoType">
+      </video>
+      <div class="portal-promo-shade"></div>
+      <div class="portal-promo-copy">
+        <span class="portal-promo-eyebrow"><i></i>{{ content.promo.eyebrow }}</span>
+        <h2>{{ content.promo.heading }}</h2>
+        <p>{{ content.promo.body }}</p>
       </div>
-
-      <div class="hero-visual" aria-label="An animated crane building a city of homes">
-        <div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div>
-        <div class="visual-label label-top"><span class="label-dot"></span> YOUR NEXT CHAPTER <b>01 / 03</b></div>
-        <div class="skyline-back"><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="hero-building">
-          <div class="building-cap"><span>EXOUSIA RESIDENCES</span><i></i></div>
-          <div class="building-floors">
-            <div class="floor"><i></i><i></i><i></i><b>08</b></div>
-            <div class="floor"><i></i><i></i><i></i><b>07</b></div>
-            <div class="floor"><i></i><i></i><i></i><b>06</b></div>
-            <div class="floor"><i></i><i></i><i></i><b>05</b></div>
-            <div class="floor"><i></i><i></i><i></i><b>04</b></div>
-            <div class="floor"><i></i><i></i><i></i><b>03</b></div>
-            <div class="floor"><i></i><i></i><i></i><b>02</b></div>
-            <div class="floor"><i></i><i></i><i></i><b>01</b></div>
-          </div>
-          <div class="building-podium"><span>THE ART OF ARRIVING</span><i></i><i></i><i></i></div>
-        </div>
-        <div class="crane">
-          <div class="crane-mast"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="crane-base"></div><div class="crane-jib"><span class="crane-cabin"></span><i class="crane-cable"></i><span class="crane-hook"></span><span class="jib-counterweight"></span></div>
-        </div>
-        <div class="floating-card unit-card"><span class="unit-icon"><Building2 :size="18" /></span><span><small>JUST PLACED</small><strong>Unit 08 · A new beginning</strong></span><i><Check :size="13" /></i></div>
-        <div class="floating-card growth-card"><span class="growth-spark"><Sparkles :size="15" /></span><span><small>YOUR PIPELINE</small><strong>Moving beautifully</strong></span><span class="growth-bars"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
-        <div class="visual-label label-bottom"><span>CAIRO, EGYPT</span><i></i><b>BUILT ON TRUST</b></div>
-        <div class="hero-ground"></div>
-      </div>
-      <a href="#platform" class="scroll-cue"><span>SCROLL TO DISCOVER</span><i></i></a>
+      <RouterLink class="portal-promo-action" :to="content.promo.button_path">{{ content.promo.button_label }} <ArrowRight :size="16"/></RouterLink>
+      <span class="portal-promo-index">FEATURED <b>01</b></span>
     </section>
 
-    <section id="platform" class="landing-intro">
-      <div class="intro-heading"><span class="landing-eyebrow">A BETTER WAY TO BUILD MOMENTUM</span><h2>Your business has a lot<br />of moving parts. <em>Now they move together.</em></h2></div>
-      <p>Good relationships build great real estate businesses. Exousia gives every conversation, property, follow-up, and deal a place to move forward—together.</p>
-    </section>
-
-    <section id="how-it-works" class="landing-pillars">
-      <article><span class="pillar-number">01</span><span class="pillar-icon"><Building2 :size="22" /></span><h3>See the whole picture.</h3><p>Keep leads, listings, and live deals in one clear view, so the next move always feels obvious.</p><a href="/register">Explore your workspace <ArrowUpRight :size="15" /></a></article>
-      <article><span class="pillar-number">02</span><span class="pillar-icon"><ArrowRight :size="22" /></span><h3>Keep every promise.</h3><p>Thoughtful tasks and follow-ups help your team show up right when it matters most.</p><a href="/register">Make room for momentum <ArrowUpRight :size="15" /></a></article>
-      <article id="for-teams"><span class="pillar-number">03</span><span class="pillar-icon"><ShieldCheck :size="22" /></span><h3>Grow with confidence.</h3><p>Company workspaces keep information in its right place, with clear roles and useful history.</p><a href="/register">Build with confidence <ArrowUpRight :size="15" /></a></article>
-    </section>
-
-    <section id="property-matching" class="landing-matching">
-      <div class="matching-copy">
-        <span class="landing-eyebrow"><i></i> THE RIGHT PLACE, FOUND FASTER</span>
-        <h2>Bring the right<br />people to the <em>right place.</em></h2>
-        <p>Connect what buyers are looking for with the homes your team knows best. Keep every listing, preference, and promising match moving in one view.</p>
-        <div class="matching-points">
-          <span><i><Check :size="13" /></i> A clear view of your inventory</span>
-          <span><i><Check :size="13" /></i> Buyer needs beside every opportunity</span>
-          <span><i><Check :size="13" /></i> Follow-ups that keep the search moving</span>
+    <section class="portal-landing-hero">
+      <div class="portal-hero-copy">
+        <span class="portal-section-eyebrow"><i></i> {{ site.settings.site_name }} <b>·</b> BUSINESS PORTAL</span>
+        <h1>{{ site.settings.welcome_heading }}</h1>
+        <p>{{ site.settings.welcome_message }}</p>
+        <div class="portal-hero-actions">
+          <RouterLink to="/login" class="portal-button-primary">{{ content.hero.primary_label }} <ArrowRight :size="17"/></RouterLink>
+          <a href="#catalogue" class="portal-link-arrow">{{ content.hero.secondary_label }} <ArrowDownRight :size="16"/></a>
         </div>
-        <RouterLink to="/register" class="matching-link">See how it works <ArrowRight :size="16" /></RouterLink>
+        <div class="portal-hero-assurance"><span><ShieldCheck :size="16"/></span><p>Built for business customers<br><strong>with account-specific access.</strong></p></div>
       </div>
-      <div class="matching-visual" role="img" aria-label="Three dimensional property cards connected to a buyer's home search">
-        <div class="match-halo halo-back"></div><div class="match-halo halo-front"></div><div class="match-grid"></div>
-        <div class="property-stack">
-          <article class="property-tile tile-back"><div class="tile-scene scene-villa"><i></i><b></b><span></span></div><small>NEW CAIRO · VILLA</small><strong>A quieter kind of luxury</strong></article>
-          <article class="property-tile tile-mid"><div class="tile-scene scene-loft"><i></i><b></b><span></span></div><small>MAADI · APARTMENT</small><strong>Room to make it yours</strong></article>
-          <article class="property-tile tile-front"><div class="tile-scene scene-residence"><i></i><b></b><span></span><em></em></div><small>5TH SETTLEMENT · APARTMENT</small><strong>A bright new beginning</strong><div class="tile-price"><span>FROM</span><b>EGP 4.8M</b></div></article>
-        </div>
-        <div class="match-path path-one"></div><div class="match-path path-two"></div>
-        <div class="buyer-card"><span class="buyer-avatar">M</span><span><small>BUYER SEARCH</small><strong>Mariam's next chapter</strong><i>2–3 bedrooms · New Cairo</i></span><b class="match-score">96%<small>MATCH</small></b></div>
-        <div class="match-tag tag-budget"><i></i> Within budget</div><div class="match-tag tag-shortlist"><Check :size="11" /> Added to shortlist</div>
-        <div class="matching-caption"><span>CURATED FOR THEIR NEXT MOVE</span><i></i><b>01 — 03</b></div>
+      <div class="portal-hero-art" aria-hidden="true">
+        <div class="portal-art-ring ring-one"></div><div class="portal-art-ring ring-two"></div>
+        <div class="portal-art-glow"></div>
+        <div class="portal-product-feature"><img :src="'/images/demo-products/product-01.svg'" alt=""><span>CARE <b>01</b></span></div>
+        <div class="portal-product-mini mini-one"><img :src="'/images/demo-products/product-08.svg'" alt=""></div>
+        <div class="portal-product-mini mini-two"><img :src="'/images/demo-products/product-09.svg'" alt=""></div>
+        <span class="portal-art-note note-one">CLEAN <i></i> PROTECT <i></i> RIDE</span>
+        <span class="portal-art-note note-two">YOUR TRADE, IN MOTION</span>
+        <div class="portal-art-stamp"><PackageSearch :size="17"/><span>PRODUCT<br>DISCOVERY</span></div>
+      </div>
+      <a href="#catalogue" class="portal-scroll-cue"><span>SCROLL TO EXPLORE</span><i></i></a>
+    </section>
+
+    <section v-if="content.catalog.enabled" id="catalogue" class="portal-catalogue-section">
+      <header class="portal-section-heading">
+        <div><span class="portal-section-eyebrow"><i></i>{{ content.catalog.eyebrow }}</span><h2>{{ content.catalog.heading }}</h2></div>
+        <div class="portal-section-aside"><p>{{ content.catalog.body }}</p><RouterLink to="/login">Browse products <ArrowRight :size="15"/></RouterLink></div>
+      </header>
+      <div class="portal-range-grid">
+        <RouterLink v-for="(tile, index) in content.catalog.tiles" :key="index" to="/login" class="portal-range-card" :class="`range-${index + 1}`">
+          <div class="portal-range-image"><img :src="categoryImages[index]" alt=""></div><span class="portal-range-number">{{ tile.eyebrow }}</span><h3>{{ tile.title }}</h3><span class="portal-range-link">Explore range <ArrowRight :size="14"/></span>
+        </RouterLink>
+      </div>
+      <p class="portal-range-note"><Check :size="14"/> Product availability and pricing are shown after you sign in to your customer account.</p>
+    </section>
+
+    <section v-if="content.benefits.enabled" id="benefits" class="portal-benefits-section">
+      <header class="portal-benefits-heading"><span class="portal-section-eyebrow"><i></i>{{ content.benefits.eyebrow }}</span><h2>{{ content.benefits.heading }}</h2><span class="portal-heading-rule"></span></header>
+      <div class="portal-benefit-grid">
+        <article v-for="(card, index) in content.benefits.cards" :key="`${index}-${card.title}`" class="portal-benefit-card">
+          <span class="portal-benefit-number">0{{ index + 1 }}</span>
+          <span class="portal-benefit-icon"><ShoppingBasket v-if="index === 1" :size="21"/><ShieldCheck v-else-if="index === 2" :size="21"/><PackageSearch v-else :size="21"/></span>
+          <h3>{{ card.title }}</h3><p>{{ card.body }}</p><span class="portal-benefit-bottom"><i></i> BUSINESS PORTAL</span>
+        </article>
       </div>
     </section>
 
-    <section class="landing-cta"><div class="cta-glow"></div><span class="landing-eyebrow">THE NEXT MOVE IS YOURS</span><h2>Let’s make room<br />for <em>what’s next.</em></h2><p>Your people. Your properties. One place to bring it all together.</p><RouterLink to="/register" class="landing-button light-button">Create your workspace <ArrowRight :size="17" /></RouterLink><RouterLink to="/login" class="cta-login">Already have a workspace? Sign in</RouterLink><div class="cta-lines"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></section>
+    <section v-if="content.cta.enabled" class="portal-landing-cta">
+      <div class="portal-cta-decoration"><i></i><i></i><i></i><i></i></div>
+      <span class="portal-section-eyebrow"><i></i>{{ content.cta.eyebrow }}</span>
+      <h2>{{ content.cta.heading }}</h2><p>{{ content.cta.body }}</p>
+      <RouterLink to="/login" class="portal-button-light">{{ content.cta.button_label }} <ArrowRight :size="16"/></RouterLink>
+      <span class="portal-cta-signup">New to the portal? <RouterLink to="/register">Request access</RouterLink></span>
+    </section>
 
-    <footer class="landing-footer"><RouterLink to="/" class="landing-brand"><span class="brand-symbol">E<span></span></span><span><strong>EXOUSIA</strong><small>REALTY</small></span></RouterLink><span>Made for the people who bring people home.</span><small>© {{ year }} Exousia Realty</small></footer>
+    <footer class="portal-landing-footer">
+      <RouterLink to="/" class="portal-landing-brand footer-brand"><img v-if="site.settings.logo_url" :src="site.settings.logo_url" :alt="`${site.settings.site_name} logo`"><span v-else class="portal-landing-mark">{{ site.settings.site_name.slice(0, 1).toUpperCase() || 'B' }}</span><span><strong>{{ site.settings.site_name }}</strong><small>{{ site.settings.tagline }}</small></span></RouterLink>
+      <p>{{ site.settings.footer_text || 'A better way to do business together.' }}</p>
+      <div class="portal-footer-links"><span v-if="site.settings.address">{{ site.settings.address }}</span><a v-if="site.settings.contact_email" :href="`mailto:${site.settings.contact_email}`">{{ site.settings.contact_email }}</a><a v-if="site.settings.contact_phone" :href="`tel:${site.settings.contact_phone}`">{{ site.settings.contact_phone }}</a><a v-if="site.settings.facebook_url" :href="site.settings.facebook_url" target="_blank" rel="noopener noreferrer">Facebook</a><a v-if="site.settings.instagram_url" :href="site.settings.instagram_url" target="_blank" rel="noopener noreferrer">Instagram</a><a v-if="site.settings.linkedin_url" :href="site.settings.linkedin_url" target="_blank" rel="noopener noreferrer">LinkedIn</a></div>
+      <small>© {{ year }} {{ site.settings.site_name }}</small>
+    </footer>
   </main>
 </template>

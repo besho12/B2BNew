@@ -3,20 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
-use App\Models\PipelineStage;
-use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Services\AuditLogger;
+use App\Services\B2BPortalService;
+use App\Services\RegistrationCaptchaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(Request $request, B2BPortalService $portal, AuditLogger $audit)
     {
         $credentials = $request->validate(['email' => ['required', 'email'], 'password' => ['required', 'string']]);
 
@@ -32,49 +33,69 @@ class AuthController extends Controller
                 'message' => 'Verify your email address before opening your workspace.',
             ], 403);
         }
+
+        $user = $request->user();
+        if (! $user->is_platform_admin && ! $user->memberships()->where('status', 'active')->exists()) {
+            $pendingMembership = $user->memberships()
+                ->where('company_id', $user->current_company_id)
+                ->where('status', 'inactive')
+                ->where('external_account_status', 'not_found')
+                ->first();
+
+            if (! $pendingMembership) {
+                return $this->rejectSignIn($request, 'Your account is not linked to an active company yet. Contact the portal administrator.', 403);
+            }
+
+            if (! $portal->isConfigured()) {
+                return $this->rejectSignIn($request, 'Customer account verification is not configured. Please try again later.', 503);
+            }
+
+            try {
+                $hasCustomerAccount = $portal->accounts($user->email) !== [];
+            } catch (RuntimeException $exception) {
+                report($exception);
+                return $this->rejectSignIn($request, 'Customer account verification is temporarily unavailable. Please try again later.', 503);
+            }
+
+            if (! $hasCustomerAccount) {
+                return $this->rejectSignIn($request, 'This email is not linked to an active B2B customer account yet.', 403, ['customer_account_required' => true]);
+            }
+
+            $old = $pendingMembership->only(['status', 'external_account_status']);
+            $pendingMembership->update([
+                'status' => 'active',
+                'external_account_status' => 'matched',
+                'joined_at' => now(),
+            ]);
+            $audit->log($request, 'membership.customer_account_verified', $pendingMembership, $old, $pendingMembership->only(['status', 'external_account_status']));
+        }
+
         return response()->json(['message' => 'Welcome back.']);
     }
 
-    public function register(Request $request)
+    public function register(Request $request, RegistrationCaptchaService $captcha)
     {
+        $request->merge(['email' => Str::lower(trim((string) $request->input('email')))]);
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:190', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
-            'company_name' => ['required', 'string', 'max:160'],
+            'captcha' => ['required', 'string', 'max:10'],
         ]);
 
-        $user = DB::transaction(function () use ($data) {
-            $company = Company::create([
-                'name' => $data['company_name'],
-                'slug' => Str::slug($data['company_name']).'-'.Str::lower(Str::random(5)),
-            ]);
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => Str::lower($data['email']),
-                'password' => Hash::make($data['password']),
-                'current_company_id' => $company->id,
-            ]);
-            $company->memberships()->create([
-                'user_id' => $user->id,
-                'role' => 'owner',
-                'status' => 'active',
-                'joined_at' => now(),
-            ]);
-            $trialPlan = SubscriptionPlan::where('slug', 'free-trial')->firstOrFail();
-            $startsAt = now();
-            $company->subscriptions()->create([
-                'plan_id' => $trialPlan->id, 'started_by' => $user->id, 'status' => 'trialing', 'billing_cycle' => 'trial',
-                'is_free_trial' => true, 'starts_at' => $startsAt, 'ends_at' => $startsAt->copy()->addDays(14),
-                'trial_started_at' => $startsAt, 'trial_ends_at' => $startsAt->copy()->addDays(14),
-            ]);
-            $this->createDefaultStages($company);
-            return $user;
-        });
+        if (! $captcha->consume($request, $data['captcha'])) {
+            throw ValidationException::withMessages(['captcha' => ['The CAPTCHA answer is incorrect or expired. Please refresh it and try again.']]);
+        }
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
 
         $user->sendEmailVerificationNotification();
         return response()->json([
-            'message' => 'Check your email to verify your address and activate your workspace.',
+            'message' => 'Your user account has been created. Verify your email; company access and permissions will be assigned separately.',
             'email' => $user->email,
         ], 201);
     }
@@ -87,22 +108,13 @@ class AuthController extends Controller
         return response()->json(['message' => 'Signed out.']);
     }
 
-    private function createDefaultStages(Company $company): void
+    private function rejectSignIn(Request $request, string $message, int $status, array $extra = [])
     {
-        $stages = [
-            ['New lead', 'عميل جديد', '#64748b'],
-            ['Contacted', 'تم التواصل', '#2563eb'],
-            ['Qualified', 'مؤهل', '#7c3aed'],
-            ['Viewing', 'معاينة', '#d97706'],
-            ['Negotiation', 'تفاوض', '#db6b32'],
-            ['Won', 'مكتمل', '#16836f', true, false],
-            ['Lost', 'مفقود', '#dc3545', false, true],
-        ];
-        foreach ($stages as $position => $stage) {
-            PipelineStage::create([
-                'company_id' => $company->id, 'name' => $stage[0], 'name_ar' => $stage[1],
-                'color' => $stage[2], 'position' => $position, 'is_won' => $stage[3] ?? false, 'is_lost' => $stage[4] ?? false,
-            ]);
-        }
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json(['message' => $message] + $extra, $status);
     }
+
 }

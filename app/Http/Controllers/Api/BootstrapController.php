@@ -29,7 +29,7 @@ class BootstrapController extends Controller
             'company' => $companyData,
             'subscription' => $subscriptions->snapshot($company),
             'companies' => $companies,
-            'membership' => ['role' => $membership->role, 'permissions' => $membership->permissions ?? []],
+            'membership' => ['role' => $membership->role, 'permissions' => $membership->effectivePermissions()],
             'stages' => PipelineStage::where('company_id', $tenant->id())->orderBy('position')->get(),
             'members' => $tenant->company()->users()->wherePivot('status', 'active')->get(['users.id', 'users.name', 'users.email']),
         ]);

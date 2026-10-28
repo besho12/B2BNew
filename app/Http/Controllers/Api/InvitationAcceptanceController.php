@@ -51,11 +51,16 @@ class InvitationAcceptanceController extends Controller
             $membership = CompanyMembership::where('company_id', $invitation->company_id)
                 ->where('user_id', $user->id)->first();
             if ($membership) {
-                $membership->update(['role' => $invitation->role, 'status' => 'active', 'joined_at' => now()]);
+                $membership->update([
+                    'role' => $invitation->role, 'status' => 'active', 'joined_at' => now(),
+                    'permissions' => $invitation->permissions,
+                    'external_account_status' => null,
+                ]);
             } else {
                 $membership = CompanyMembership::create([
                     'company_id' => $invitation->company_id, 'user_id' => $user->id,
                     'role' => $invitation->role, 'status' => 'active', 'joined_at' => now(),
+                    'permissions' => $invitation->permissions,
                 ]);
             }
 

@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { BadgeCheck, Building2, CalendarDays, Eye, Handshake, Pencil, Plus, Search } from '@lucide/vue'
 import { api } from '../api'
@@ -212,7 +212,7 @@ onMounted(() => { load(); loadOptions() })
     <div v-if="error && !showEditor" class="detail-alert">{{ error }}<button @click="error = ''">Dismiss</button></div>
     <section class="deal-stats"><article><span><Handshake /></span><div><strong>{{ pagination.total || 0 }}</strong><small>Deals in this view</small></div></article><article><span class="active"><Building2 /></span><div><strong>{{ activeCount }}</strong><small>Active on this page</small></div></article><article><span class="won"><BadgeCheck /></span><div><strong>{{ wonCount }}</strong><small>Closed won on this page</small></div></article></section>
     <section class="panel deals-panel">
-      <div class="table-toolbar"><div class="search-box"><Search /><input v-model="search" placeholder="Search lead or propertyâ€¦"></div><div class="filter-actions"><select v-model="statusFilter"><option value="">All deal stages</option><option v-for="item in statuses" :key="item" :value="item">{{ statusLabel(item) }}</option></select></div></div>
+      <div class="table-toolbar"><div class="search-box"><Search /><input v-model="search" placeholder="Search lead or propertyâ€¦"></div><div class="filter-actions"><AppSelect v-model="statusFilter"><option value="">All deal stages</option><option v-for="item in statuses" :key="item" :value="item">{{ statusLabel(item) }}</option></AppSelect></div></div>
       <div class="inventory-table-wrap"><table class="inventory-table deals-table"><thead><tr><th>Lead</th><th>Property</th><th>Status</th><th>Agreed value</th><th>Expected close</th><th></th></tr></thead><tbody>
         <tr v-if="loading"><td colspan="6" class="inventory-empty">Loading dealsâ€¦</td></tr>
         <tr v-else-if="!deals.length"><td colspan="6"><div class="table-empty"><Handshake /><strong>No deals yet</strong><span>{{ canCreate ? 'Create a deal when a lead starts negotiating for a property.' : 'There are no deals available in this workspace.' }}</span></div></td></tr>
@@ -223,15 +223,15 @@ onMounted(() => { load(); loadOptions() })
 
     <Modal v-if="showEditor" :title="editingId ? 'Deal details' : 'Add a deal'" description="Track the transaction separately from the lead enquiry." @close="showEditor = false">
       <form class="form-grid deal-form" @submit.prevent="save">
-        <label class="full">Lead<select v-model="form.lead_id" :disabled="!!editingId || !canEditActive" required><option value="" disabled>Select a lead</option><option v-for="lead in leadOptions" :key="lead.id" :value="lead.id">{{ lead.name }} Â· {{ lead.phone_original }}</option><option v-if="activeDeal && !leadOptions.some(lead => lead.id === form.lead_id)" :value="form.lead_id">{{ activeDeal.lead.name }}</option></select></label>
-        <label class="full">Property listing<select v-model="form.property_listing_id" :disabled="!canEditActive"><option value="">No property linked yet</option><option v-for="property in propertyOptions" :key="property.id" :value="property.id">{{ property.title }} Â· {{ property.reference_code }} ({{ property.location }})</option><option v-if="activeDeal?.property && !propertyOptions.some(property => property.id === form.property_listing_id)" :value="form.property_listing_id">{{ activeDeal.property.title }}</option></select></label>
-        <label>Deal stage<select v-model="form.status" :disabled="!canEditActive"><option v-for="item in statuses" :key="item" :value="item" :disabled="item === 'closed_won' && !canCloseDeals">{{ statusLabel(item) }}</option></select></label>
+        <label class="full">Lead<AppSelect v-model="form.lead_id" :disabled="!!editingId || !canEditActive" required><option value="" disabled>Select a lead</option><option v-for="lead in leadOptions" :key="lead.id" :value="lead.id">{{ lead.name }} Â· {{ lead.phone_original }}</option><option v-if="activeDeal && !leadOptions.some(lead => lead.id === form.lead_id)" :value="form.lead_id">{{ activeDeal.lead.name }}</option></AppSelect></label>
+        <label class="full">Property listing<AppSelect v-model="form.property_listing_id" :disabled="!canEditActive"><option value="">No property linked yet</option><option v-for="property in propertyOptions" :key="property.id" :value="property.id">{{ property.title }} Â· {{ property.reference_code }} ({{ property.location }})</option><option v-if="activeDeal?.property && !propertyOptions.some(property => property.id === form.property_listing_id)" :value="form.property_listing_id">{{ activeDeal.property.title }}</option></AppSelect></label>
+        <label>Deal stage<AppSelect v-model="form.status" :disabled="!canEditActive"><option v-for="item in statuses" :key="item" :value="item" :disabled="item === 'closed_won' && !canCloseDeals">{{ statusLabel(item) }}</option></AppSelect></label>
         <label>Expected close date<input v-model="form.expected_close_date" :disabled="!canEditActive" type="date"></label>
         <label class="full">Agreed value (EGP)<input v-model="form.agreed_price_egp" :disabled="!canEditActive" inputmode="decimal" pattern="[0-9]+(\.[0-9]{1,2})?" placeholder="Optional until negotiated"></label>
         <section v-if="form.status === 'closed_won'" class="deal-closing-fields full">
           <header><strong>Close deal with signed contract</strong><small>Upload the signed contract PDF below, then record the agreed payment details to complete the sale.</small></header>
           <div class="deal-payment-grid">
-            <label>Payment method<select v-model="form.payment_method" :disabled="!canEditActive" required><option value="" disabled>Select method</option><option value="cash">Cash</option><option value="bank_transfer">Bank transfer</option><option value="cheque">Cheque</option><option value="financing">Financing</option><option value="other">Other</option></select></label>
+            <label>Payment method<AppSelect v-model="form.payment_method" :disabled="!canEditActive" required><option value="" disabled>Select method</option><option value="cash">Cash</option><option value="bank_transfer">Bank transfer</option><option value="cheque">Cheque</option><option value="financing">Financing</option><option value="other">Other</option></AppSelect></label>
             <label>Amount received (EGP)<input v-model="form.amount_received_egp" :disabled="!canEditActive" inputmode="decimal" pattern="[0-9]+(\.[0-9]{1,2})?" required placeholder="0.00"></label>
             <label v-if="Number(form.amount_received_egp || 0) > 0">Received date<input v-model="form.payment_received_on" :disabled="!canEditActive" type="date" required></label>
             <label>Payment reference<input v-model="form.payment_reference" :disabled="!canEditActive" maxlength="100" placeholder="Receipt, cheque, or transfer reference"></label>
@@ -247,14 +247,14 @@ onMounted(() => { load(); loadOptions() })
   <div v-if="commissions.length" class="finance-record-list">
     <div v-for="entry in commissions" :key="entry.id" class="finance-record">
       <span><strong>{{ entry.payee_name }}</strong><small>{{ entry.unit_reference }} · {{ money(entry.amount_egp) }}<template v-if="entry.calculation_type === 'percentage' && entry.rate_percent"> · {{ entry.rate_percent }}% of {{ money(String(Number(entry.base_amount_minor_units || 0) / 100)) }}</template><template v-if="entry.due_on"> · Due {{ dateLabel(entry.due_on) }}</template></small></span>
-      <select v-if="canManageCommissions && !['paid','void'].includes(entry.status)" :value="entry.status" aria-label="Commission status" @change="changeCommission(entry, ($event.target as HTMLSelectElement).value)"><option value="pending">Pending</option><option value="approved">Approved</option><option value="paid">Paid</option><option value="void">Void</option></select>
+      <AppSelect v-if="canManageCommissions && !['paid','void'].includes(entry.status)" :value="entry.status" aria-label="Commission status" @change="changeCommission(entry, ($event.target as HTMLSelectElement).value)"><option value="pending">Pending</option><option value="approved">Approved</option><option value="paid">Paid</option><option value="void">Void</option></AppSelect>
       <span v-else class="finance-status" :class="entry.status">{{ statusLabel(entry.status) }}</span>
     </div>
   </div>
   <p v-else class="finance-empty">No commission entries recorded for this deal.</p>
   <div v-if="canManageCommissions" class="commission-form commission-calculator">
-    <select v-model="commissionForm.payee_user_id" required aria-label="Commission payee"><option value="" disabled>Payee</option><option v-for="member in auth.bootstrap?.members || []" :key="member.id" :value="member.id">{{ member.name }}</option></select>
-    <select v-model="commissionForm.calculation_type" aria-label="Commission calculation method"><option value="percentage" :disabled="!canCalculateCommission">Percentage of unit value</option><option value="fixed">Fixed amount</option></select>
+    <AppSelect v-model="commissionForm.payee_user_id" required aria-label="Commission payee"><option value="" disabled>Payee</option><option v-for="member in auth.bootstrap?.members || []" :key="member.id" :value="member.id">{{ member.name }}</option></AppSelect>
+    <AppSelect v-model="commissionForm.calculation_type" aria-label="Commission calculation method"><option value="percentage" :disabled="!canCalculateCommission">Percentage of unit value</option><option value="fixed">Fixed amount</option></AppSelect>
     <input v-if="commissionForm.calculation_type === 'percentage'" v-model="commissionForm.rate_percent" required min="0.01" max="100" step="0.01" type="number" inputmode="decimal" placeholder="Rate (%)">
     <input v-else v-model="commissionForm.amount_egp" required inputmode="decimal" pattern="[0-9]+(\.[0-9]{1,2})?" placeholder="Amount (EGP)">
     <input v-model="commissionForm.due_on" type="date" aria-label="Commission due date">

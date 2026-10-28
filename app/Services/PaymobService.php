@@ -67,7 +67,7 @@ class PaymobService
 
     public function createCheckout(Company $company, User $user, SubscriptionPlan $plan, string $cycle): array
     {
-        if (! $this->isConfigured()) throw new RuntimeException('Paymob checkout is not available yet. Please contact Exousia support.');
+        if (! $this->isConfigured()) throw new RuntimeException('Paymob checkout is not available yet. Please contact the portal administrator.');
         $settings = $this->settings();
         $amount = $plan->priceFor($cycle);
         if (! $amount || $amount < 1) throw new RuntimeException('The selected billing price is not available.');
@@ -83,14 +83,14 @@ class PaymobService
             'currency' => 'EGP',
             'payment_methods' => $settings['payment_methods'],
             'items' => [[
-                'name' => 'Exousia Realty - '.$plan->name.' ('.($cycle === 'year' ? 'Annual' : 'Monthly').')',
+                'name' => 'B2B Portal - '.$plan->name.' ('.($cycle === 'year' ? 'Annual' : 'Monthly').')',
                 'amount' => $amount, 'description' => 'Company workspace subscription for '.$company->name, 'quantity' => 1,
             ]],
             'billing_data' => [
                 'first_name' => $names[0] ?: 'Customer', 'last_name' => $names[1] ?? 'Account',
                 'phone_number' => $user->phone ?: 'N/A', 'email' => $user->email,
                 'street' => 'Not provided', 'building' => '0', 'floor' => '0', 'apartment' => '0',
-                'city' => 'Cairo', 'state' => 'Cairo', 'country' => 'EG', 'postal_code' => 'NA',
+            'city' => 'Cairo', 'state' => 'Cairo', 'country' => 'EG', 'postal_code' => 'NA',
             ],
             'special_reference' => $reference, 'expiration' => 1800,
             'notification_url' => route('subscriptions.paymob-callback'),

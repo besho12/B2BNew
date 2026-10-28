@@ -47,3 +47,7 @@
 16. Company logos are kept on private storage, served only to authenticated members of the owning company, and changed only by members with workspace settings permission.
 
 Subscriptions include monthly/yearly plans, one-time 14-day trials, tenant-level access enforcement, plan team-member limits, and Paymob hosted checkout with HMAC-verified callbacks. Platform owners are authorized separately through `users.is_platform_admin`; they can review global company, usage, deal-value, and subscription-payment data and can suspend companies or grant manual subscription access. Platform grants are audited and are not recorded as collected payments. Paymob still requires environment credentials and a live/sandbox verification pass before payments can be accepted. Other external integrations remain planned. Deal records, commission entries, private deal documents, and deterministic property recommendations are implemented.
+
+- support_cases, support_case_messages, and support_case_attachments: tenant-scoped B2B support requests, threaded replies, business-system/contact context, private files, and post-resolution requester feedback; internal notes are restricted to case managers.
+
+Support-case visibility is company-scoped. Agents see only cases they created or are assigned; management roles can view and manage company cases.

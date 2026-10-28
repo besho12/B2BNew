@@ -80,7 +80,7 @@ onMounted(load)
     <header class="page-heading"><div><span class="eyebrow">PAYROLL CONTROL</span><h1>Commissions</h1><p>Review employee commission orders, collect signed copies, and record completed payments.</p></div><span class="commission-security-note"><BadgeCheck :size="16" />Workspace private</span></header>
     <div v-if="error" class="detail-alert">{{ error }}<button @click="error = ''">Dismiss</button></div>
     <section class="panel commission-register">
-      <div class="commission-register-toolbar"><div class="search-box"><Search /><input v-model="search" placeholder="Search employee, unit, or reference…"></div><select v-model="status" aria-label="Filter commissions by status"><option value="">All statuses</option><option value="pending">Pending approval</option><option value="approved">Approved</option><option value="paid">Paid</option><option value="void">Void</option></select></div>
+      <div class="commission-register-toolbar"><div class="search-box"><Search /><input v-model="search" placeholder="Search employee, unit, or reference…"></div><AppSelect v-model="status" aria-label="Filter commissions by status"><option value="">All statuses</option><option value="pending">Pending approval</option><option value="approved">Approved</option><option value="paid">Paid</option><option value="void">Void</option></AppSelect></div>
       <div class="commission-workflow-hint"><strong>Payment workflow</strong><span>Approve the commission → print the payment order for signature → upload the signed PDF → mark it paid.</span></div>
       <div class="table-wrap"><table class="commission-table">
         <thead><tr><th>Employee / unit</th><th>Commission basis</th><th>Amount</th><th>Status</th><th>Signed order</th><th>Actions</th></tr></thead>

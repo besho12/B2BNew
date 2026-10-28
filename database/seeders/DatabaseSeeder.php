@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(SubscriptionPlansSeeder::class);
 
-        $company = Company::create(['name' => 'Nile Gate Realty (Demo)', 'slug' => 'nile-gate-demo', 'phone' => '01000000000']);
+        $company = Company::create(['name' => 'Northstar Supply (Demo)', 'slug' => 'northstar-supply-demo', 'phone' => '01000000000']);
         $other = Company::create(['name' => 'Palm Key Properties (Demo)', 'slug' => 'palm-key-demo', 'brand_color' => '#6f8054']);
 
         $this->call(PreferredLocationSeeder::class);

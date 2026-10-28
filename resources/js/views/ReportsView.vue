@@ -47,7 +47,7 @@ async function exportCsv() {
     const url = URL.createObjectURL(response.data)
     const anchor = document.createElement('a')
     anchor.href = url
-    anchor.download = `exousia-report-${period.value}.csv`
+    anchor.download = `portal-report-${period.value}.csv`
     anchor.click()
     URL.revokeObjectURL(url)
   } catch (exception: any) {
@@ -61,7 +61,7 @@ onMounted(load)
 
 <template>
   <div class="reports-page">
-    <header class="page-heading reports-heading"><div><span class="eyebrow">BROKERAGE PERFORMANCE</span><h1>Reports</h1><p>Lead conversion and deal progress from your workspace records.</p></div><div class="reports-heading-actions"><label class="reports-period">Reporting period<select v-model="period"><option value="month">This month</option><option value="quarter">This quarter</option><option value="year">Year to date</option></select></label><button class="button secondary" :disabled="exporting || loading" @click="exportCsv"><Download />{{ exporting ? 'Preparing…' : 'Export CSV' }}</button></div></header>
+    <header class="page-heading reports-heading"><div><span class="eyebrow">BUSINESS PERFORMANCE</span><h1>Reports</h1><p>Lead conversion and deal progress from your workspace records.</p></div><div class="reports-heading-actions"><label class="reports-period">Reporting period<AppSelect v-model="period"><option value="month">This month</option><option value="quarter">This quarter</option><option value="year">Year to date</option></AppSelect></label><button class="button secondary" :disabled="exporting || loading" @click="exportCsv"><Download />{{ exporting ? 'Preparing…' : 'Export CSV' }}</button></div></header>
     <div v-if="error" class="detail-alert">{{ error }}</div>
     <div v-else-if="loading" class="skeleton-grid"><i v-for="item in 4" :key="item"></i></div>
     <template v-else-if="report">

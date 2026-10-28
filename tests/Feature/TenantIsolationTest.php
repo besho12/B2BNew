@@ -7,6 +7,7 @@ use App\Models\FollowUpTask;
 use App\Models\Lead;
 use App\Models\PipelineStage;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -66,6 +67,7 @@ class TenantIsolationTest extends TestCase
 
     public function test_task_buckets_filter_open_work_and_return_useful_counts(): void
     {
+        $this->travelTo(Carbon::parse('2026-10-28 12:00:00'));
         [$company, $owner] = $this->workspace('alpha');
         $overdue = $this->task($company, $owner, 'Overdue follow-up', now()->subDay());
         $today = $this->task($company, $owner, 'Call today', now()->addHours(2));
@@ -88,6 +90,7 @@ class TenantIsolationTest extends TestCase
 
     public function test_agent_task_buckets_only_include_tasks_assigned_to_them(): void
     {
+        $this->travelTo(now()->startOfDay()->addHours(12));
         [$company, $owner] = $this->workspace('alpha');
         $agent = User::factory()->create(['current_company_id' => $company->id]);
         $otherAgent = User::factory()->create(['current_company_id' => $company->id]);

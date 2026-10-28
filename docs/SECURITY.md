@@ -10,3 +10,8 @@
 - `.env`, uploads, storage keys, build hot files, and dependencies remain ignored.
 
 Before production: upgrade the framework, conduct dependency and authorization reviews, add secure private-media controllers with short-lived signed URLs, field masking/export approval, consent and retention workflows, MFA for privileged users, structured security logging, secret rotation, backup restore drills, and a legal review under applicable Egyptian data-protection obligations. This repository does not claim legal compliance.
+
+
+## Support ticket files and feedback
+
+Ticket attachments use the private filesystem disk and tenant-scoped metadata. Reads go through the authenticated support API and verify case visibility; non-management members cannot download files attached to internal notes. Requester feedback is accepted once, after resolution, from the original case creator. File scanning and external email-link feedback are not yet implemented.

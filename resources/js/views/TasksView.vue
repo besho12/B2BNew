@@ -100,8 +100,8 @@ onMounted(load)
     <Modal v-if="showCreate" title="Create a follow-up" description="Assign a clear next action and due time." @close="showCreate = false">
       <form class="form-grid" @submit.prevent="create">
         <label class="full">Task title<input v-model="form.title" required placeholder="Call client with availability update"></label>
-        <label>Assigned to<select v-model="form.assigned_to" required><option v-for="member in auth.bootstrap?.members" :key="member.id" :value="member.id">{{ member.name }}</option></select></label>
-        <label>Priority<select v-model="form.priority"><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option></select></label>
+        <label>Assigned to<AppSelect v-model="form.assigned_to" required><option v-for="member in auth.bootstrap?.members" :key="member.id" :value="member.id">{{ member.name }}</option></AppSelect></label>
+        <label>Priority<AppSelect v-model="form.priority"><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option></AppSelect></label>
         <label class="full">Due at<input v-model="form.due_at" type="datetime-local" required></label>
         <label class="full">Notes<input v-model="form.description" placeholder="Optional context"></label>
         <div v-if="error" class="form-error full">{{ error }}</div>

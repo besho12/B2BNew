@@ -36,12 +36,12 @@ function removeLocation(name: string) {
     <span class="field-label">Preferred locations</span>
     <div class="location-picker-control">
       <span class="location-picker-icon"><MapPin :size="15" /></span>
-      <select v-model="selected" :disabled="loading || !available.length" @change="addLocation">
+      <AppSelect v-model="selected" :disabled="loading || !available.length" @change="addLocation">
         <option value="">{{ loading ? 'Loading locations…' : available.length ? 'Select a location' : 'All locations selected' }}</option>
         <option v-for="location in available" :key="location.id" :value="location.name">
           {{ location.name }}{{ location.name_ar ? ` · ${location.name_ar}` : '' }}
         </option>
-      </select>
+      </AppSelect>
     </div>
     <div v-if="modelValue.length" class="location-tags" aria-label="Selected preferred locations">
       <span v-for="name in modelValue" :key="name" class="location-tag">

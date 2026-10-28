@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#102a2e">
-    <title>Exousia Realty</title>
-    <meta name="description" content="A modern real estate brokerage workspace built for the Egyptian market.">
+    <title>B2B Portal</title>
+    <meta name="description" content="A secure business customer portal for managing products, orders, and account access.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -22,6 +22,6 @@
     @endif
 </head>
 <body>
-    <div id="app"><div style="min-height:100vh;display:grid;place-items:center;background:#f4f5f1;color:#102a2e;font:600 16px sans-serif">Loading Exousia Realty…</div></div>
+    <div id="app"><div style="min-height:100vh;display:grid;place-items:center;background:#f4f5f1;color:#102a2e;font:600 16px sans-serif">Loading B2B Portal…</div></div>
 </body>
 </html>

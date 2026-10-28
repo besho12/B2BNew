@@ -1,6 +1,10 @@
-﻿# Exousia Realty implementation plan
+# Exousia Realty implementation plan
 
-Updated: 2026-10-17
+Updated: 2026-10-28
+
+## Ongoing implementation instruction
+
+- Preserve the current project's structure, UI, and the main intent of each transferred feature. While progressing through tasks, fix related bugs and make practical usability or reliability improvements without changing that intent.
 
 ## Current status
 
@@ -111,6 +115,55 @@ npm.cmd run build pass. CSV, permission boundaries, matching filters, commission
 - Deal closing controls: the workspace stores received amount, derived balance, payment method/reference/date, and payment terms in integer EGP minor units. Only deal managers can move a deal to won, and only after a private signed contract PDF is attached and a valid agreed price/payment record is present. The printable closing statement presents the buyer, unit, price, receipts, outstanding balance, terms, and signature blocks. Deal API tests cover the contract prerequisite, payment details, derived balance, and agent denial.
 - Commission/deal PDF verification: `php artisan test`: 56 tests and 383 assertions pass; `npm.cmd run typecheck` and `npm.cmd run build` pass. Signed commission documents and executed deal contracts accept PDFs; newly created commissions are covered through the standalone commission register endpoint; the build retains the CKEditor chunk size warning.
 
+## QuintechSupport feature transfer scope
+
+B2BNew supplies the retained product shell: login, registration, email verification and recovery, workspace/profile/account pages, Vue app shell, layout, and design system. QuintechSupport supplies the business features to port. Do not extend Exousia Realty workflows such as leads, property inventory, viewings, deals, commissions, or real-estate reports as part of this transfer. Existing files remain untouched unless a replacement slice is ready.
+
+### Phase 1: B2B support tickets
+
+- [x] Tenant-scoped ticket creation and listing, status/priority/assignment, threaded replies, manager-only internal notes, audit history, and a responsive page in the existing shell.
+
+### Phase 2: ticket context, private files, and requester feedback
+
+- [x] Generic system/contact/support-contract fields; private attachments for ticket descriptions and replies; authenticated tenant-checked downloads; 10 MB per-file and 20-file per-ticket limits; one 1-5 requester rating after resolution.
+- Email notifications use the shared, platform-owner-managed support reply template; email-linked public feedback remains to be added after the signed-link flow is mapped.
+- [x] Basic support-case API verification covers tenant-owned create/read, cross-company read isolation, and denial for members without support-case permissions. Full attachment, reply visibility, and feedback behavior still need dedicated verification.
+- Phase 2 is implemented; email notifications and email-linked public feedback remain outstanding.
+
+### Later transfer phases
+
+- [ ] Supplier/customer onboarding forms adapted to the B2B source fields without real-estate form fields.
+- [ ] Project, agenda, task, change-request, and timesheet workflows from QuintechSupport, reusing the existing app shell.
+- [ ] Cart, checkout, quotations/orders, invoices/credits, and payments. Rebuild those data/workflows for the B2B domain; the source API is external. Catalog browsing/search/filtering with account-specific stock data is implemented as an external adapter, pending deployment configuration and runtime integration.
 
 
+### B2B commerce: product details and demo basket
+- [x] Add a quick product-detail modal and an account-scoped sample basket with case-size quantity increments, item removal, clear basket, summary, and responsive basket page.
+- [x] Replace browser-only basket state with an authenticated, session-backed cart scoped to the signed-in user and selected customer account. The server resolves live product prices and checks case quantity and stock when lines are added or changed; checkout remains disabled.
+- [x] Add `/user/quickOrder` with multi-line SKU entry, product lookup, quantity and line totals, CSV/XLSX templates and import, and server-validated all-or-nothing basket updates. XLSX reads the first worksheet with SKU and Quantity columns (or the first two columns), validates 1–50 unique lines, and limits uploads to 5 MB. Basket session keys include company scope. Quick order adds basket lines only; it does not submit an order.
+- [ ] Add legacy binary `.xls` import after selecting a parser that supports that format; ExcelJS supports `.xlsx`, and the UI asks users to save old `.xls` sheets as `.xlsx` first.
+- [ ] External checkout, addresses, payment methods, order creation, and payment status remain separate follow-up work; no order is submitted by the demo basket.
+### B2B portal catalog and customer accounts
 
+Scope update (2026-10-28): continue transferring Muc-Off customer portal workflows. Customer-facing plans and billing pages are out of scope; portal, catalog, basket, order history, account details, addresses, and BP user routes do not require an active SaaS subscription. Company suspension checks remain enforced. Billing backend/platform work is not part of the portal transfer.
+
+- [x] Add a portal-owner master settings console inspired by the source site's master settings: global identity/logo, interface colors, welcome-page copy, header style/announcement, contact/footer links, a pinned promo video, and editable/toggleable landing modules. Landing settings are platform-admin-only, audited, and applied to the public welcome page and customer shell; uploaded logos remain private behind a public brand route.
+- [x] Make `/platform` the Portal Owner landing dashboard with clearly labeled fictional summaries for customer accounts, portal users, orders, catalogue activity, and recent events. Live cross-account reporting endpoints remain future work.
+- [x] Add the legacy Mail Templates menu concept as a platform-owner console for support replies, workspace invitations, and email verification. Templates use escaped plain text, explicit validated placeholders, default reset, and audit events; invitation, verification, and public support reply emails consume the saved templates.
+- [x] Add server-side adapter for the muc-off-master account list, product list, and filter endpoints; service token remains server-only.
+- [x] Add authenticated account selection (auto-select the sole account; require selection when several are returned) and a product catalog search/filter/load-more screen in the existing Vue shell. Preserve nested source categories as an expandable tree and show the branded catalog treatment in the portal-owner settings preview.
+- [x] Improve catalog paging with initial and append skeletons, a disabled/progress-aware load-more action, deduplicated appended items, stale-response protection, and normalized upstream paging metadata.
+- [x] Restrict the temporary catalog and its subscription bypass to local/testing environments by default, with an explicit environment override; production now fails closed if the external portal is not configured, including stale demo sessions.
+- [ ] Remove the temporary ten-item static catalog after the external catalog is configured and validated in deployment.
+- [x] Add read-only B2B order history from the source `get_sales_orders` endpoint, scoped to the selected account, with search, pagination, and the existing application shell.
+- [x] Organize order history under a dedicated Sales AR navigation group and add adjustable page size plus a filtered Excel export (capped at 10,000 rows). Invoice and credit-note workflows remain pending until their source endpoints are integrated.
+- [x] Add the Muc-Off customer account details page using the selected-account `getMyAccountDetails` endpoint; demo mode clearly distinguishes local profile data from unavailable ERP details.
+- [x] Add the selected-account invoice and shipping address book using `getMyAccountAddresses`, with responsive address cards and a read-only change-request note.
+- [x] Replace BP user role selection with grouped General and Sales permission checkboxes. Persist permissions on company memberships and invitations, apply them on acceptance, and enforce them in portal API access and navigation.
+- [x] Add audited, tenant-scoped “Login as” for workspace owners/admins, limited to active members in the same workspace, with a persistent return-to-account action.
+- [x] Add a responsive `/user/my_account` account hub inspired by the source page, linking to customer details, addresses, and order history; invoices and credit notes are clearly marked unavailable until their endpoint is integrated.
+- [ ] Configure B2B_PORTAL_API_BASE_URL and B2B_PORTAL_API_TOKEN plus endpoint overrides in the deployment environment. The connected source service must be reachable; runtime behavior is not verified here.
+- [x] Source get_products_list returns rendered HTML in its data field. The UI extracts the source add-to-basket button data into native product cards with details and basket actions, retaining a sandboxed iframe fallback for unrecognized markup. Prefer structured item data from the service when available.
+- [x] Product favorites: implement the source account-aware favorite toggle and refresh the catalog/favorites filter after changes. Demo favorites remain in page state for layout testing.
+- [x] Harden the shared B2B HTTP adapter with validated endpoint URL composition, production HTTPS enforcement, redirect rejection, configurable timeouts, safe JSON response checks, and source-specific stock-cache keys.
+- [x] Gate new workspace membership activation on the configured customer-account lookup. Registrations with no matching B2B account remain inactive; sign-in retries the lookup and activates the tenant membership if the account is later provisioned. Local demo/testing registration remains available when explicitly unconfigured.

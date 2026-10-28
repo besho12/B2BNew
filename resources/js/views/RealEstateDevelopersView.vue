@@ -32,7 +32,7 @@ async function load() {
     developers.value = data.data
     pagination.value = data
   } catch (exception: any) {
-    error.value = exception.response?.data?.message || 'Unable to load real estate developers.'
+    error.value = exception.response?.data?.message || 'Unable to load business partners.'
   } finally { loading.value = false }
 }
 
@@ -82,13 +82,13 @@ onMounted(load)
 
 <template>
   <div class="developer-page">
-    <header class="page-heading"><div><span class="eyebrow">YOUR PARTNER NETWORK</span><h1>Real estate developers</h1><p>Keep the builders behind your inventory close at hand.</p></div><button v-if="canManage" class="button primary" @click="openCreate"><Plus :size="18" />Add developer</button></header>
+    <header class="page-heading"><div><span class="eyebrow">YOUR PARTNER NETWORK</span><h1>Business partners</h1><p>Keep your business partners and their contact details close at hand.</p></div><button v-if="canManage" class="button primary" @click="openCreate"><Plus :size="18" />Add developer</button></header>
     <div v-if="error && !showEditor" class="detail-alert">{{ error }}<button @click="error = ''">Dismiss</button></div>
     <section class="developer-summary"><article><span class="developer-summary-icon"><Building2 /></span><div><strong>{{ pagination.total || 0 }}</strong><small>Developer partners</small></div></article><article><span class="developer-summary-icon active"><ShieldCheck /></span><div><strong>{{ activeCount }}</strong><small>Active relationships on this page</small></div></article></section>
     <section class="panel developer-panel">
-      <header class="developer-toolbar"><div><h2>Developer directory</h2><p>Search names and contact details; link a developer when maintaining a property.</p></div><div class="developer-filters"><select v-model="activeFilter" aria-label="Filter developers by status"><option value="">All partners</option><option value="active">Active</option><option value="inactive">Inactive</option></select><label class="search-box"><Search :size="17" /><input v-model="search" placeholder="Search developers or contacts…"><button v-if="search" type="button" aria-label="Clear search" @click="search = ''"><X :size="15" /></button></label></div></header>
+      <header class="developer-toolbar"><div><h2>Developer directory</h2><p>Search names and contact details; link a developer when maintaining a property.</p></div><div class="developer-filters"><AppSelect v-model="activeFilter" aria-label="Filter developers by status"><option value="">All partners</option><option value="active">Active</option><option value="inactive">Inactive</option></AppSelect><label class="search-box"><Search :size="17" /><input v-model="search" placeholder="Search developers or contacts…"><button v-if="search" type="button" aria-label="Clear search" @click="search = ''"><X :size="15" /></button></label></div></header>
       <div v-if="loading" class="developer-loading"><i v-for="item in 6" :key="item" /></div>
-      <div v-else-if="!developers.length" class="developer-empty"><Building2 /><strong>{{ search ? 'No developers match that search' : 'Your partner network starts here' }}</strong><span>{{ search ? 'Try a name, phone number, or contact email.' : 'Add the real estate developers your brokerage works with, then connect them to listings.' }}</span><button v-if="!search && canManage" class="button secondary" @click="openCreate"><Plus :size="15" />Add your first developer</button></div>
+      <div v-else-if="!developers.length" class="developer-empty"><Building2 /><strong>{{ search ? 'No partners match that search' : 'Your partner directory starts here' }}</strong><span>{{ search ? 'Try a name, phone number, or contact email.' : 'Add the business partners you work with, then connect them to inventory.' }}</span><button v-if="!search && canManage" class="button secondary" @click="openCreate"><Plus :size="15" />Add your first partner</button></div>
       <div v-else class="developer-grid">
         <article v-for="developer in developers" :key="developer.id" class="developer-card" :class="{ inactive: !developer.is_active }">
           <header><span class="developer-mark"><Building2 :size="19" /></span><span class="developer-state" :class="{ inactive: !developer.is_active }"><i />{{ developer.is_active ? 'Active partner' : 'Inactive' }}</span></header>
@@ -100,7 +100,7 @@ onMounted(load)
       </div>
       <footer v-if="pagination.last_page > 1" class="developer-pagination"><span>Page {{ pagination.current_page }} of {{ pagination.last_page }} · {{ pagination.total }} developers</span><div><button class="button secondary" :disabled="page <= 1" @click="page--">Previous</button><button class="button secondary" :disabled="page >= pagination.last_page" @click="page++">Next</button></div></footer>
     </section>
-    <Modal v-if="showEditor" :title="editingId ? 'Edit developer' : 'Add a real estate developer'" description="Save useful contact details once, then link this partner to as many properties as needed." @close="showEditor = false">
+    <Modal v-if="showEditor" :title="editingId ? 'Edit partner' : 'Add a business partner'" description="Save useful contact details once, then link this partner to as many properties as needed." @close="showEditor = false">
       <form class="form-grid" @submit.prevent="save">
         <label class="full">Developer name<input v-model.trim="form.name" required maxlength="160" placeholder="e.g. Palm Hills Developments"></label>
         <label>Contact person<input v-model.trim="form.contact_name" maxlength="160" placeholder="Sales representative"></label><label>Phone<input v-model.trim="form.phone" type="tel" maxlength="40" placeholder="+20 10…"></label>

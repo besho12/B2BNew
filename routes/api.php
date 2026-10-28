@@ -1,6 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\RegistrationCaptchaController;
+use App\Http\Controllers\Api\AuthContextController;
+use App\Http\Controllers\Api\ImpersonationController;
+use App\Http\Controllers\Api\B2BPortalController;
+use App\Http\Controllers\Api\B2BCartController;
 use App\Http\Controllers\Api\AccountRecoveryController;
 use App\Http\Controllers\Api\BootstrapController;
 use App\Http\Controllers\Api\DashboardController;
@@ -17,8 +22,11 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\SupportCaseController;
 use App\Http\Controllers\Api\PlatformAdminController;
 use App\Http\Controllers\Api\PlatformPaymentSettingsController;
+use App\Http\Controllers\Api\PortalSiteSettingsController;
+use App\Http\Controllers\Api\PortalMailTemplateController;
 use App\Http\Controllers\Api\PropertyViewingController;
 use App\Http\Controllers\Api\RealEstateDeveloperController;
 use App\Http\Controllers\Api\CompanyBrandingController;
@@ -37,8 +45,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware('web')->group(function () {
     Route::get('/subscription-plans', [SubscriptionController::class, 'plans']);
+    Route::get('/site-settings', [PortalSiteSettingsController::class, 'show']);
+    Route::get('/site-settings/logo', [PortalSiteSettingsController::class, 'logo'])->name('portal-site.logo');
     Route::post('/subscriptions/paymob/callback', [SubscriptionController::class, 'paymobCallback'])->middleware('throttle:30,1')->name('subscriptions.paymob-callback');
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+    Route::get('/auth/register/captcha', RegistrationCaptchaController::class)->middleware('throttle:30,1');
     Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
     Route::post('/auth/invitations/accept', InvitationAcceptanceController::class)->middleware('throttle:10,1');
     Route::post('/auth/password/forgot', [AccountRecoveryController::class, 'sendResetLink'])->middleware('throttle:3,1');
@@ -48,9 +59,17 @@ Route::prefix('v1')->middleware('web')->group(function () {
         ->middleware('signed')->name('auth.email.verify');
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/auth/context', AuthContextController::class);
         Route::middleware(['verified', 'platform-admin'])->prefix('platform')->group(function () {
             Route::get('/bootstrap', [PlatformAdminController::class, 'bootstrap']);
             Route::get('/overview', [PlatformAdminController::class, 'overview']);
+            Route::get('/users', [PlatformAdminController::class, 'users']);
+            Route::get('/site-settings', [PortalSiteSettingsController::class, 'show']);
+            Route::post('/site-settings', [PortalSiteSettingsController::class, 'update']);
+            Route::delete('/site-settings/logo', [PortalSiteSettingsController::class, 'removeLogo']);
+            Route::get('/mail-templates', [PortalMailTemplateController::class, 'index']);
+            Route::put('/mail-templates', [PortalMailTemplateController::class, 'update']);
+            Route::delete('/mail-templates/{key}', [PortalMailTemplateController::class, 'reset']);
             Route::get('/paymob-settings', [PlatformPaymentSettingsController::class, 'show']);
             Route::put('/paymob-settings', [PlatformPaymentSettingsController::class, 'update']);
             Route::get('/companies', [PlatformAdminController::class, 'companies']);
@@ -59,6 +78,9 @@ Route::prefix('v1')->middleware('web')->group(function () {
             Route::post('/companies/{company}/renew', [PlatformAdminController::class, 'renew']);
         });
         Route::post('/auth/logout', [AuthController::class, 'logout']);
+        Route::post('/auth/impersonation/stop', [ImpersonationController::class, 'stop']);
+        Route::get('/portal/accounts', [B2BPortalController::class, 'accounts']);
+        Route::post('/portal/account', [B2BPortalController::class, 'selectAccount']);
         Route::post('/companies/{company}/switch', [BootstrapController::class, 'switchCompany']);
 
         Route::middleware('verified')->group(function () {
@@ -68,8 +90,29 @@ Route::prefix('v1')->middleware('web')->group(function () {
             Route::get('/subscriptions', [SubscriptionController::class, 'status']);
             Route::post('/subscriptions/free-trial', [SubscriptionController::class, 'startFreeTrial']);
             Route::post('/subscriptions/checkout', [SubscriptionController::class, 'checkout'])->middleware('throttle:5,1');
+            Route::get('/portal/cart', [B2BCartController::class, 'index']);
+            Route::post('/portal/cart/items', [B2BCartController::class, 'store']);
+            Route::post('/portal/cart/quick-order', [B2BCartController::class, 'quickOrder']);
+            Route::patch('/portal/cart/items/{sku}', [B2BCartController::class, 'update']);
+            Route::delete('/portal/cart/items/{sku}', [B2BCartController::class, 'destroy']);
+            Route::delete('/portal/cart', [B2BCartController::class, 'clear']);
             Route::middleware('subscription')->group(function () {
             Route::get('/dashboard', DashboardController::class);
+            Route::get('/portal/products/{sku}', [B2BPortalController::class, 'showProduct']);
+            Route::get('/portal/orders', [B2BPortalController::class, 'orders']);
+            Route::get('/portal/account-details', [B2BPortalController::class, 'accountDetails']);
+            Route::get('/portal/addresses', [B2BPortalController::class, 'addresses']);
+            Route::post('/portal/products/{sku}/favorite', [B2BPortalController::class, 'toggleFavorite']);
+            Route::post('/portal/products', [B2BPortalController::class, 'products']);
+            Route::get('/portal/filters', [B2BPortalController::class, 'filters']);
+            Route::get('/support-cases', [SupportCaseController::class, 'index']);
+            Route::post('/support-cases', [SupportCaseController::class, 'store']);
+            Route::get('/support-cases/{supportCase}', [SupportCaseController::class, 'show']);
+            Route::patch('/support-cases/{supportCase}', [SupportCaseController::class, 'update']);
+            Route::post('/support-cases/{supportCase}/messages', [SupportCaseController::class, 'reply']);
+            Route::post('/support-cases/{supportCase}/attachments', [SupportCaseController::class, 'uploadAttachment']);
+            Route::get('/support-cases/{supportCase}/attachments/{attachment}', [SupportCaseController::class, 'downloadAttachment'])->name('support-cases.attachments.download');
+            Route::post('/support-cases/{supportCase}/feedback', [SupportCaseController::class, 'feedback']);
             Route::post('/company/logo', [CompanyBrandingController::class, 'store']);
             Route::delete('/company/logo', [CompanyBrandingController::class, 'destroy']);
             Route::get('/developers', [RealEstateDeveloperController::class, 'index']);
@@ -121,6 +164,7 @@ Route::prefix('v1')->middleware('web')->group(function () {
             Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete']);
             Route::get('/team/members', [TeamController::class, 'index']);
             Route::post('/team/members', [TeamController::class, 'store']);
+            Route::post('/team/members/{membership}/impersonate', [ImpersonationController::class, 'start']);
             Route::patch('/team/members/{membership}', [TeamController::class, 'update']);
             Route::delete('/team/invitations/{invitation}', [TeamController::class, 'revoke']);
             });

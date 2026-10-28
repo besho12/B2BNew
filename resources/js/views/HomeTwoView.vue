@@ -9,7 +9,7 @@ const year = new Date().getFullYear()
 <template>
   <main class="home2-page">
     <header class="home2-nav">
-      <RouterLink to="/" class="home2-brand" aria-label="Exousia Realty home"><span class="home2-mark">E<i></i></span><span><strong>EXOUSIA</strong><small>REALTY</small></span></RouterLink>
+      <RouterLink to="/" class="home2-brand" aria-label="B2B Portal home"><span class="home2-mark">E<i></i></span><span><strong>B2B PORTAL</strong><small>PORTAL</small></span></RouterLink>
       <button class="home2-menu" aria-label="Toggle navigation" @click="menuOpen = !menuOpen"><Menu :size="21" /></button>
       <nav :class="{ open: menuOpen }"><a href="#home2-platform" @click="menuOpen = false">The experience</a><a href="#home2-journey" @click="menuOpen = false">Your workflow</a><a href="#home2-team" @click="menuOpen = false">For your team</a><RouterLink to="/login" class="home2-signin">Sign in <ArrowUpRight :size="15" /></RouterLink></nav>
     </header>
@@ -18,8 +18,8 @@ const year = new Date().getFullYear()
       <div class="home2-copy">
         <span class="home2-eyebrow"><i></i> FOR THE PEOPLE BEHIND EVERY PLACE</span>
         <h1>Good things<br />happen when<br /><em>everything connects.</em></h1>
-        <p>Relationships are the heart of real estate. Bring your clients, properties, and team into one considered space—and let the right connections lead you home.</p>
-        <div class="home2-actions"><RouterLink to="/register" class="home2-button">Find your flow <ArrowRight :size="17" /></RouterLink><a href="#home2-platform" class="home2-explore">Discover Exousia <ArrowDown :size="15" /></a></div>
+        <p>Relationships are the heart of business. Bring your clients, properties, and team into one considered space—and let the right connections lead you home.</p>
+        <div class="home2-actions"><RouterLink to="/register" class="home2-button">Find your flow <ArrowRight :size="17" /></RouterLink><a href="#home2-platform" class="home2-explore">Discover B2B Portal <ArrowDown :size="15" /></a></div>
         <div class="home2-note"><span><Heart :size="15" /></span><div>Every client has a story.<br /><strong>Help yours find its place.</strong></div></div>
       </div>
 
@@ -40,12 +40,12 @@ const year = new Date().getFullYear()
       <a class="home2-scroll" href="#home2-platform">A MORE HUMAN WAY TO WORK <i></i></a>
     </section>
 
-    <section id="home2-platform" class="home2-intro"><div><span class="home2-eyebrow">YOUR PEOPLE, YOUR PROPERTIES, YOUR MOMENT</span><h2>Real estate is personal.<br /><em>Your workspace should be, too.</em></h2></div><p>Exousia helps independent brokerages build trust at every turn. One connected workspace, thoughtfully made for the way your team works and the way your clients choose.</p></section>
+    <section id="home2-platform" class="home2-intro"><div><span class="home2-eyebrow">YOUR PEOPLE, YOUR PROPERTIES, YOUR MOMENT</span><h2>Business is personal.<br /><em>Your workspace should be, too.</em></h2></div><p>B2B Portal helps independent businesss build trust at every turn. One connected workspace, thoughtfully made for the way your team works and the way your clients choose.</p></section>
 
-    <section id="home2-journey" class="home2-journey"><div class="journey-heading"><span class="home2-eyebrow">A LITTLE MORE CLARITY. A LOT MORE CONNECTION.</span><h2>Make every next step<br /><em>feel like the right one.</em></h2></div><div class="journey-cards"><article><span class="journey-icon"><UsersRound :size="21" /></span><small>01 / KNOW YOUR PEOPLE</small><h3>Start with a conversation.</h3><p>Give every client a thoughtful story, with the details and history your team needs to make them feel seen.</p><span class="journey-line"><i></i><i></i><i></i></span></article><article><span class="journey-icon"><Compass :size="21" /></span><small>02 / FIND THEIR PLACE</small><h3>Make the right match.</h3><p>Keep your listings close to your leads, preferences, and active deals. The right home is easier to find together.</p><div class="journey-homes"><i></i><i></i><i></i><i></i></div></article><article id="home2-team"><span class="journey-icon"><ShieldCheck :size="21" /></span><small>03 / MOVE AS ONE</small><h3>Build trust as a team.</h3><p>Bring your brokerage together with clear ownership, useful history, and a calm view of what needs attention.</p><span class="team-dots"><i>A</i><i>M</i><i>S</i><i>+</i></span></article></div></section>
+    <section id="home2-journey" class="home2-journey"><div class="journey-heading"><span class="home2-eyebrow">A LITTLE MORE CLARITY. A LOT MORE CONNECTION.</span><h2>Make every next step<br /><em>feel like the right one.</em></h2></div><div class="journey-cards"><article><span class="journey-icon"><UsersRound :size="21" /></span><small>01 / KNOW YOUR PEOPLE</small><h3>Start with a conversation.</h3><p>Give every client a thoughtful story, with the details and history your team needs to make them feel seen.</p><span class="journey-line"><i></i><i></i><i></i></span></article><article><span class="journey-icon"><Compass :size="21" /></span><small>02 / FIND THEIR PLACE</small><h3>Make the right match.</h3><p>Keep your listings close to your leads, preferences, and active deals. The right home is easier to find together.</p><div class="journey-homes"><i></i><i></i><i></i><i></i></div></article><article id="home2-team"><span class="journey-icon"><ShieldCheck :size="21" /></span><small>03 / MOVE AS ONE</small><h3>Build trust as a team.</h3><p>Bring your business together with clear ownership, useful history, and a calm view of what needs attention.</p><span class="team-dots"><i>A</i><i>M</i><i>S</i><i>+</i></span></article></div></section>
 
     <section class="home2-cta"><div class="cta2-orbit"></div><span class="home2-eyebrow">A GOOD PLACE TO START</span><h2>Your next great<br />connection is <em>waiting.</em></h2><p>Make the work flow. Give every relationship room to grow.</p><RouterLink to="/register" class="home2-button home2-light">Create your workspace <ArrowRight :size="17" /></RouterLink><RouterLink to="/login" class="home2-login">Already have a workspace? Sign in</RouterLink><div class="cta2-buildings"><i></i><i></i><i></i><i></i><i></i></div></section>
 
-    <footer class="home2-footer"><RouterLink to="/" class="home2-brand"><span class="home2-mark">E<i></i></span><span><strong>EXOUSIA</strong><small>REALTY</small></span></RouterLink><span>Relationships first. Real estate, together.</span><small>© {{ year }} Exousia Realty</small></footer>
+    <footer class="home2-footer"><RouterLink to="/" class="home2-brand"><span class="home2-mark">E<i></i></span><span><strong>B2B PORTAL</strong><small>PORTAL</small></span></RouterLink><span>Relationships first. Business, together.</span><small>© {{ year }} B2B Portal</small></footer>
   </main>
 </template>

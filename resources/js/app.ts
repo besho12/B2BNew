@@ -1,9 +1,12 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
+import AppSelect from './components/AppSelect.vue'
 import router from './router'
 import 'ckeditor5/ckeditor5.css'
 import '../css/app.css'
+import '../css/site-theme.css'
+import '../css/portal-landing.css'
 import '../css/landing-features.css'
 import '../css/task-workflow.css'
 import '../css/property-viewings.css'
@@ -12,4 +15,4 @@ import '../css/platform-admin.css'
 import '../css/platform-overrides.css'
 import '../css/sidebar-groups.css'
 
-createApp(App).use(createPinia()).use(router).mount('#app')
+createApp(App).component('AppSelect', AppSelect).use(createPinia()).use(router).mount('#app')

@@ -11,7 +11,7 @@ const firstName=computed(()=>auth.bootstrap?.user.name.split(' ')[0]); const can
 const money=(value:number)=>new Intl.NumberFormat(auth.locale==='ar'?'ar-EG':'en-EG',{style:'currency',currency:'EGP',maximumFractionDigits:0}).format(value||0)
 </script>
 <template><div class="dashboard-page">
-  <header class="page-heading"><div><span class="eyebrow">{{today}}</span><h1>{{t.welcome}}, {{firstName}}.</h1><p>Here’s what needs your attention across the brokerage today.</p></div><RouterLink to="/leads" class="button primary"><Plus :size="18"/>{{t.newLead}}</RouterLink></header>
+  <header class="page-heading"><div><span class="eyebrow">{{today}}</span><h1>{{t.welcome}}, {{firstName}}.</h1><p>Here’s what needs your attention across your workspace today.</p></div><RouterLink to="/leads" class="button primary"><Plus :size="18"/>{{t.newLead}}</RouterLink></header>
   <div v-if="loading" class="skeleton-grid"><i v-for="n in 4" :key="n"/></div>
   <section v-else class="metrics-grid">
     <RouterLink to="/leads" class="metric-link" aria-label="View new leads"><article><div class="metric-icon sage"><UserRoundPlus/></div><span>New leads <small>THIS MONTH</small></span><strong>{{data.metrics.new_leads}}</strong><p><ArrowUpRight/> Live from your CRM</p></article></RouterLink>

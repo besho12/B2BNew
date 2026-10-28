@@ -8,7 +8,7 @@ const route = useRoute()
 const email = ref(String(route.query.email || ''))
 const loading = ref(false)
 const error = ref('')
-const message = ref(route.query.sent === '1' ? 'We sent a verification link. Open it to activate your workspace.' : '')
+const message = ref(route.query.sent === '1' ? 'We sent a verification link. Open it to verify your email. Company access will be linked to your profile separately.' : '')
 
 async function resend() {
   loading.value = true; error.value = ''; message.value = ''
@@ -22,4 +22,4 @@ async function resend() {
 }
 </script>
 
-<template><main class="register-page"><div class="register-brand"><div class="brand-mark">E</div><strong>EXOUSIA <span>REALTY</span></strong></div><section class="register-card"><div class="register-icon"><MailCheck /></div><span class="eyebrow">VERIFY YOUR EMAIL</span><h1>Check your inbox.</h1><p>Verify your email address before opening the workspace. If the link expires, request another one here.</p><form class="form-grid" @submit.prevent="resend"><label class="full">Work email<input v-model="email" type="email" autocomplete="email" required placeholder="you@company.com"></label><div v-if="message" class="team-success full">{{ message }}</div><div v-if="error" class="form-error full">{{ error }}</div><button class="button primary wide full" :disabled="loading">{{ loading ? 'Sending…' : 'Resend verification link' }}<ArrowRight :size="18" /></button></form><p class="auth-alt"><RouterLink to="/login">Back to sign in</RouterLink></p></section></main></template>
+<template><main class="register-page"><div class="register-brand"><div class="brand-mark">B</div><strong>B2B <span>PORTAL</span></strong></div><section class="register-card"><div class="register-icon"><MailCheck /></div><span class="eyebrow">VERIFY YOUR EMAIL</span><h1>Check your inbox.</h1><p>Verify your email address. Company access and permissions are linked to your profile separately.</p><form class="form-grid" @submit.prevent="resend"><label class="full">Work email<input v-model="email" type="email" autocomplete="email" required placeholder="you@company.com"></label><div v-if="message" class="team-success full">{{ message }}</div><div v-if="error" class="form-error full">{{ error }}</div><button class="button primary wide full" :disabled="loading">{{ loading ? 'Sending…' : 'Resend verification link' }}<ArrowRight :size="18" /></button></form><p class="auth-alt"><RouterLink to="/login">Back to sign in</RouterLink></p></section></main></template>

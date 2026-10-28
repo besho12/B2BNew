@@ -17,6 +17,9 @@ class EnsureCompanySubscription
         if ($company->is_suspended) {
             return response()->json(['code' => 'company_suspended', 'message' => 'This company workspace has been suspended. Contact Exousia support for assistance.'], 403);
         }
+        if (str_starts_with($request->path(), 'api/v1/portal/') || str_starts_with($request->path(), 'api/v1/team/')) {
+            return $next($request);
+        }
         $subscription = $this->subscriptions->current($company);
         if (! $subscription) {
             return response()->json([
